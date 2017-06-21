@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\Hud\HpIndicatorController.cs" />
     <Compile Include="Assets\Scripts\Hud\HudController.cs" />
     <Compile Include="Assets\Scripts\Hud\MouseCursorSelector.cs" />
+    <Compile Include="Assets\Scripts\Menu\Menu.cs" />
     <Compile Include="Assets\Scripts\Player\IkHandler.cs" />
     <Compile Include="Assets\Scripts\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerAnimatorController.cs" />

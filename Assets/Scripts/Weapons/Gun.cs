@@ -20,6 +20,7 @@ public abstract class Gun : MonoBehaviour {
     public BulletType bulletType;
     public GunType gunType;
     public int bullets;
+    public Transform gunBarrel;
 
     public abstract void PullTrigger();
 
@@ -30,10 +31,10 @@ public abstract class Gun : MonoBehaviour {
         if (bullets > 0)
         {
            print("Shot!");
-            Ray ray = new Ray(GunsManager.Instance.gunBarrel.position, GunsManager.Instance.gunBarrel.forward);
+            Ray ray = new Ray(gunBarrel.position, gunBarrel.forward);
             Debug.DrawRay(ray.origin, ray.direction*10, Color.green, 0.2f);
 
-            GunsManager.Instance.gunBarrel.GetComponent<ParticleSystem>().Play();
+            gunBarrel.GetComponent<ParticleSystem>().Play();
 
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 1000f))

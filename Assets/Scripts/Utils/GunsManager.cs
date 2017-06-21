@@ -19,17 +19,24 @@ public class GunsManager : MonoBehaviour {
         else
             instance = this;
 
-        gunBarrel = transform.parent;
+        //gunBarrel = transform.parent;
         guns = new List<Gun>();
+        GameObject rightHand = GameObject.FindGameObjectWithTag("RightHand");
         foreach (var prefabWeapon in prefabWeapons)
         {
-            guns.Add(Instantiate(prefabWeapon));
+            Gun weapon = Instantiate(prefabWeapon, rightHand.transform);
+            weapon.transform.localRotation = Quaternion.identity;
+
+            //weapon.transform.localEulerAngles = Vector3.zero;
+            //weapon.gameObject.SetActive(false);
+            guns.Add(weapon);
         }
     }
 
     void Start()
     {
-        Player.Instance.gun = CurrentGun();
+        //Player.Instance.gun = CurrentGun();
+        gunBarrel = guns[0].gunBarrel;
         UpdateGunHud(CurrentGun());
     }
 

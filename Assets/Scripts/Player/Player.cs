@@ -8,8 +8,8 @@ public class Player : MonoBehaviour {
 
     public PlayerAnimatorController animatorController;
     private CharacterController characterController;
-    public Gun gun;
-    public GameObject gunModel;
+    public Gun gun { get { return GunsManager.Instance.CurrentGun(); } }
+    //public Gun gun;
 
     private Vector3 moveDirection = Vector3.zero;
     public float walkSpeed;
@@ -62,9 +62,9 @@ public class Player : MonoBehaviour {
         }
 
         if (Input.GetKeyUp(KeyCode.E))
-            gun = GunsManager.Instance.NextGun();
+            GunsManager.Instance.NextGun();
         if (Input.GetKeyUp(KeyCode.Q))
-            gun = GunsManager.Instance.PrevGun();
+            GunsManager.Instance.PrevGun();
     }
 
     void Move()
@@ -111,7 +111,7 @@ public class Player : MonoBehaviour {
     {
         Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10);
         position = Camera.main.ScreenToWorldPoint(position);
-        position.y = gunModel.transform.position.y;
+        position.y = gun.transform.position.y;
         Debug.DrawRay(position, Vector3.forward, Color.blue);
         Debug.DrawRay(position, Vector3.right, Color.blue);
         Debug.DrawRay(position, Vector3.left, Color.blue);
@@ -121,7 +121,7 @@ public class Player : MonoBehaviour {
         {
             transform.LookAt(new Vector3(position.x, transform.position.y, position.z));
 
-            gunModel.transform.forward = (position - gunModel.transform.position);
+            //gun.transform.forward = (position - gun.transform.position);
         }
     }
 
