@@ -17,8 +17,8 @@ public class Spawner : MonoBehaviour {
 	void Update () {
         limitsMin = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, Camera.main.transform.position.y));
         limitsMax = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, Camera.main.transform.position.y));
-        print(limitsMin);
-        print(limitsMax);
+        /*print(limitsMin);
+        print(limitsMax);*/
         if (Input.GetKeyUp(KeyCode.T))
         {
             print("ZOMBIE!!");

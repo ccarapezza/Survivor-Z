@@ -11,7 +11,7 @@ public class BloodParticleGenerator : MonoBehaviour {
     private void Awake()
     {
         if (instance != null && instance != this)
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         else
             instance = this;
     }
@@ -22,6 +22,7 @@ public class BloodParticleGenerator : MonoBehaviour {
         bloodSplash.transform.parent = parent;
         bloodSplash.transform.position = position;
         bloodSplash.transform.forward = -direction;
+        Destroy(bloodSplash.gameObject, 1);
         /*bloodSplash.transform.parent = enemy.transform;
         bloodSplash.transform.position = hit.point;
         bloodSplash.transform.forward = -ray.direction;*/

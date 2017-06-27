@@ -28,9 +28,12 @@ public class GunsManager : MonoBehaviour {
             weapon.transform.localRotation = Quaternion.identity;
 
             //weapon.transform.localEulerAngles = Vector3.zero;
-            //weapon.gameObject.SetActive(false);
+            weapon.gameObject.SetActive(false);
             guns.Add(weapon);
         }
+
+        guns[0].gameObject.SetActive(true);
+
     }
 
     void Start()
@@ -47,20 +50,33 @@ public class GunsManager : MonoBehaviour {
 
     public Gun NextGun()
     {
+        guns[currentGun].gameObject.SetActive(false);
         if (++currentGun > guns.Count - 1)
             currentGun = 0;
-
+        guns[currentGun].gameObject.SetActive(true);
         UpdateGunHud(guns[currentGun]);
         return guns[currentGun];
     }
 
     public Gun PrevGun()
     {
+        guns[currentGun].gameObject.SetActive(false);
         if (--currentGun < 0)
             currentGun = guns.Count - 1;
-
+        guns[currentGun].gameObject.SetActive(true);
         UpdateGunHud(guns[currentGun]);
         return guns[currentGun];
+    }
+
+    public void AddGun(Gun gun)
+    {
+        GameObject rightHand = GameObject.FindGameObjectWithTag("RightHand");
+        Gun weapon = Instantiate(gun, rightHand.transform);
+        weapon.transform.localRotation = Quaternion.identity;
+
+        //weapon.transform.localEulerAngles = Vector3.zero;
+        weapon.gameObject.SetActive(false);
+        guns.Add(weapon);
     }
 
     private void UpdateGunHud(Gun gun)

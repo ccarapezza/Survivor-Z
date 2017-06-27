@@ -21,6 +21,7 @@ public abstract class Gun : MonoBehaviour {
     public GunType gunType;
     public int bullets;
     public Transform gunBarrel;
+    public GameObject bulletPrefab;
 
     public abstract void PullTrigger();
 
@@ -30,15 +31,16 @@ public abstract class Gun : MonoBehaviour {
     {
         if (bullets > 0)
         {
-           print("Shot!");
             Ray ray = new Ray(gunBarrel.position, gunBarrel.forward);
-            Debug.DrawRay(ray.origin, ray.direction*10, Color.green, 0.2f);
-
-            gunBarrel.GetComponent<ParticleSystem>().Play();
-
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 1000f))
             {
+                Debug.DrawLine(ray.origin, hit.point, Color.green);
+                GameObject bullet = Instantiate(bulletPrefab);
+                bullet.GetComponent<Interpolation>().destination = hit.point;
+                bullet.transform.position = gunBarrel.position;
+                bullet.transform.forward = ray.direction;
+
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemys"))
                 {
                     EnemyBaseController enemy = hit.collider.GetComponent<EnemyBaseController>();
