@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/InGame/Level1.unity
+- path: Assets/Cementery/Level2NormalLevel.unity
   isLoaded: 1
   isActive: 1
