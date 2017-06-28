@@ -129,7 +129,7 @@ public class Player : MonoBehaviour {
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Enemys"))
         {
-            Damage(10);
+            Damage(other.gameObject.GetComponentInParent<EnemyBaseController>().damagePoints);
             BloodParticleGenerator.Instance.GenerateBloodSplash(transform, other.transform.position, other.GetComponentInParent<Collider>().transform.forward);
         }
     }

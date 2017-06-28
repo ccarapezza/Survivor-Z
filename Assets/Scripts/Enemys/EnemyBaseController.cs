@@ -18,6 +18,7 @@ public abstract class EnemyBaseController : MonoBehaviour {
     protected int initialHp;
     public float distanceAttack;
     protected bool dead;
+    public int damagePoints;
 
     private Vector3 destination;
 
