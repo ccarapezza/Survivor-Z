@@ -1,35 +1,101 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Spawner : MonoBehaviour {
-    public GameObject zombiePrefab;
+    public GameObject zombie1Prefab;
+    public GameObject zombie2Prefab;
     public float inset;
+
+    public List<WaveData> waves;
+
+    private int wavesLeft;
+    private int currentWave;
+    private int zombiesAlive;
+    private bool waveSpawnFinish;
 
     Vector3 limitsMin;
     Vector3 limitsMax;
     // Use this for initialization
     void Start () {
-		
-	}
+        currentWave = 1;
+        StartCoroutine(ZombieWaveGeneratorCoroutine(waves[0]));
+        waveSpawnFinish = false;
+    }
 	
 	// Update is called once per frame
 	void Update () {
         limitsMin = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, Camera.main.transform.position.y));
         limitsMax = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, Camera.main.transform.position.y));
-        /*print(limitsMin);
-        print(limitsMax);*/
-        if (Input.GetKeyUp(KeyCode.T))
-        {
-            print("ZOMBIE!!");
-            Vector3 randomPos = new Vector3(limitsMax.x,5, limitsMax.z);
-            GameObject zombie = Instantiate(zombiePrefab);
-            zombie.transform.position = randomPos;
-            //RandomPosOutsideCamera();
+    }
+
+    public void ZombieDead() {
+        zombiesAlive--;
+        if (waveSpawnFinish && zombiesAlive < 1) {
+            waves.RemoveAt(0);
+            if (waves.Count>0)
+            {
+                StartCoroutine(ZombieWaveGeneratorCoroutine(waves[0]));
+            }
+            else
+            {
+                MessageCanvasManager.Instance.ShowCanvasMessage("SECTOR CLEARED! " + currentWave++, 4);
+            }
+
         }
     }
 
-    void RandomPosOutsideCamera()
+    IEnumerator ZombieWaveGeneratorCoroutine(WaveData wave/*int zombie1Count, int zombie2Count, int minSimultaneousSpawns, int maxSimultaneousSpawns*/) {
+        MessageCanvasManager.Instance.ShowCanvasMessage("WAVE "+currentWave++, 4);
+        yield return new WaitForSeconds(4f);
+        waveSpawnFinish = false;
+        int totalZombies = wave.zombie1Count + wave.zombie2Count;
+        List<int> spawnsRounds = new List<int>();
+        spawnsRounds.Add(Mathf.CeilToInt(totalZombies * 0.2f));
+        spawnsRounds.Add(Mathf.CeilToInt(totalZombies * 0.3f));
+        spawnsRounds.Add(totalZombies - spawnsRounds[0] - spawnsRounds[1]);
+
+        while (wave.zombie1Count > 0 || wave.zombie2Count > 0) {
+            int zombieIndexToSpawn = Random.Range(0, 2);
+            if (wave.zombie1Count < 1)
+                zombieIndexToSpawn = 1;
+            if (wave.zombie2Count < 1)
+                zombieIndexToSpawn = 0;
+
+            int min = (wave.zombie1Count + wave.zombie2Count < wave.minSimultaneousSpawns) ? wave.zombie1Count + wave.zombie2Count : wave.minSimultaneousSpawns;
+            int max = (wave.zombie1Count + wave.zombie2Count < wave.maxSimultaneousSpawns) ? wave.zombie1Count + wave.zombie2Count : wave.minSimultaneousSpawns;
+
+            int zombieSpawnCount = spawnsRounds[0];
+            spawnsRounds.RemoveAt(0);
+            while (zombieSpawnCount > 0)
+            {
+                GameObject zombiePrefab;
+                if (zombieIndexToSpawn == 0)
+                {
+                    wave.zombie1Count--;
+                    zombiePrefab = zombie1Prefab;
+                }
+                else
+                {
+                    wave.zombie2Count--;
+                    zombiePrefab = zombie2Prefab;
+                }
+                SpawnZombieOutsideOfCamera(zombiePrefab);
+                zombiesAlive++;
+                zombieSpawnCount--;
+                yield return new WaitForSeconds(Random.Range(0.3f, 1.5f));
+            }
+
+            while (zombiesAlive < 0)
+            {
+                yield return new WaitForSeconds(1f);
+            }
+        }
+        waveSpawnFinish = true;
+    }
+
+    void SpawnZombieOutsideOfCamera(GameObject zombiePrefab)
     {
         Vector3 randomPos = Vector3.zero;
         randomPos.y = 5;
@@ -50,8 +116,21 @@ public class Spawner : MonoBehaviour {
             else
                 randomPos.x = limitsMax.x + inset;
         }
-        
-        GameObject zombie = Instantiate(zombiePrefab);
-        zombie.transform.position = randomPos;
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomPos, out hit, 10.0f, NavMesh.AllAreas))
+        {
+            GameObject zombie = Instantiate(zombiePrefab);
+            zombie.transform.position = hit.position;
+        }
     }
+}
+
+
+[System.Serializable]
+public class WaveData {
+    public int zombie1Count;
+    public int zombie2Count;
+    public int minSimultaneousSpawns;
+    public int maxSimultaneousSpawns;
 }
