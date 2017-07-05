@@ -136,13 +136,14 @@ public class Player : MonoBehaviour {
 
     public void Damage(int damage)
     {
-        hp--;
+        hp-= damage;
         if (hp <= 0)
             Dead();
     }
 
     public void Dead() {
         Destroy(gameObject);
+        LevelSceneManager.Instance.CambiarEscenaMainMenu();
     }
 
     public void Heal(int value)

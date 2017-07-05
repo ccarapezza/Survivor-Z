@@ -7,7 +7,7 @@ public class MessageCanvasManager : MonoBehaviour {
 
     private static MessageCanvasManager instance;
     public static MessageCanvasManager Instance { get { return instance; } }
-    private Text message;
+    public Text message;
 
     private void Awake()
     {
@@ -23,7 +23,6 @@ public class MessageCanvasManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        message = GetComponent<Text>();
         message.color = new Color(message.color.r, message.color.g, message.color.b, 0f);
     }
 
@@ -33,6 +32,7 @@ public class MessageCanvasManager : MonoBehaviour {
 
     private IEnumerator ShowMessage(string text, float stayTime)
     {
+        message.color = new Color(message.color.r, message.color.g, message.color.b, 0f);
         message.text = text;
         float fadeInCurrentTime = 0f;
         float fadeInTime = 3f;

@@ -22,6 +22,7 @@ public abstract class Gun : MonoBehaviour {
     public int bullets;
     public Transform gunBarrel;
     public GameObject bulletPrefab;
+    public int damagePoints;
 
     public abstract void PullTrigger();
 
@@ -44,21 +45,22 @@ public abstract class Gun : MonoBehaviour {
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemys"))
                 {
                     EnemyBaseController enemy = hit.collider.GetComponent<EnemyBaseController>();
-                    enemy.Damage(CalculateDamage(bulletType), hit.point, ray.direction);
+                    if(enemy!=null)
+                        enemy.Damage(CalculateDamage(), hit.point, ray.direction);
                 }
             }
             GunHudController.Instance.ChangeBulletCount(--bullets);
         }
     }
 
-    protected int CalculateDamage(BulletType bulletType)
+    protected int CalculateDamage()
     {
-        if (bulletType == BulletType.Small)
+        /*if (bulletType == BulletType.Small)
             return 2;
         if (bulletType == BulletType.Normal)
             return 5;
         if (bulletType == BulletType.Large)
-            return 10;
-        return 0;
+            return 10;*/
+        return damagePoints;
     }
 }

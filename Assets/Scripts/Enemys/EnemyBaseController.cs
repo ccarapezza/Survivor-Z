@@ -76,7 +76,10 @@ public abstract class EnemyBaseController : MonoBehaviour {
         BloodParticleGenerator.Instance.GenerateBloodSplash(transform, hitPosition, hitDirection);
         hp -= damage;
         if (hp <= 0)
+        {
+            Spawner.Instance.ZombieDead();
             Dead();
+        }
     }
 
     protected virtual void Dead()

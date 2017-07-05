@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class Spawner : MonoBehaviour {
+    private static Spawner instance;
+    public static Spawner Instance { get { return instance; } }
+
     public GameObject zombie1Prefab;
     public GameObject zombie2Prefab;
     public float inset;
@@ -17,15 +20,28 @@ public class Spawner : MonoBehaviour {
 
     Vector3 limitsMin;
     Vector3 limitsMax;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+    }
+
     // Use this for initialization
-    void Start () {
+    void Start() {
         currentWave = 1;
         StartCoroutine(ZombieWaveGeneratorCoroutine(waves[0]));
         waveSpawnFinish = false;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
         limitsMin = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, Camera.main.transform.position.y));
         limitsMax = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, Camera.main.transform.position.y));
     }
@@ -34,16 +50,22 @@ public class Spawner : MonoBehaviour {
         zombiesAlive--;
         if (waveSpawnFinish && zombiesAlive < 1) {
             waves.RemoveAt(0);
-            if (waves.Count>0)
+            if (waves.Count > 0)
             {
                 StartCoroutine(ZombieWaveGeneratorCoroutine(waves[0]));
             }
             else
             {
-                MessageCanvasManager.Instance.ShowCanvasMessage("SECTOR CLEARED! " + currentWave++, 4);
+                StartCoroutine(FinishLevel());
             }
-
         }
+    }
+
+    IEnumerator FinishLevel()
+    {
+        MessageCanvasManager.Instance.ShowCanvasMessage("SECTOR CLEARED!", 4);
+        yield return new WaitForSeconds(5f);
+        LevelSceneManager.Instance.NextLevel();
     }
 
     IEnumerator ZombieWaveGeneratorCoroutine(WaveData wave/*int zombie1Count, int zombie2Count, int minSimultaneousSpawns, int maxSimultaneousSpawns*/) {
@@ -58,33 +80,38 @@ public class Spawner : MonoBehaviour {
 
         while (wave.zombie1Count > 0 || wave.zombie2Count > 0) {
             int zombieIndexToSpawn = Random.Range(0, 2);
-            if (wave.zombie1Count < 1)
+            if (wave.zombie1Count < 1 && wave.zombie2Count>1)
                 zombieIndexToSpawn = 1;
-            if (wave.zombie2Count < 1)
+            if (wave.zombie2Count < 1 && wave.zombie1Count > 1)
                 zombieIndexToSpawn = 0;
 
             int min = (wave.zombie1Count + wave.zombie2Count < wave.minSimultaneousSpawns) ? wave.zombie1Count + wave.zombie2Count : wave.minSimultaneousSpawns;
             int max = (wave.zombie1Count + wave.zombie2Count < wave.maxSimultaneousSpawns) ? wave.zombie1Count + wave.zombie2Count : wave.minSimultaneousSpawns;
 
-            int zombieSpawnCount = spawnsRounds[0];
-            spawnsRounds.RemoveAt(0);
-            while (zombieSpawnCount > 0)
+
+
+
+            foreach (var spawnsRound in spawnsRounds)
             {
-                GameObject zombiePrefab;
-                if (zombieIndexToSpawn == 0)
+                int zombieSpawnCount = spawnsRound;
+                while (zombieSpawnCount > 0)
                 {
-                    wave.zombie1Count--;
-                    zombiePrefab = zombie1Prefab;
+                    GameObject zombiePrefab;
+                    if (zombieIndexToSpawn == 0)    
+                    {
+                        wave.zombie1Count--;
+                        zombiePrefab = zombie1Prefab;
+                    }
+                    else
+                    {
+                        wave.zombie2Count--;
+                        zombiePrefab = zombie2Prefab;
+                    }
+                    SpawnZombieOutsideOfCamera(zombiePrefab);
+                    zombiesAlive++;
+                    zombieSpawnCount--;
+                    yield return new WaitForSeconds(Random.Range(0.3f, 1.5f));
                 }
-                else
-                {
-                    wave.zombie2Count--;
-                    zombiePrefab = zombie2Prefab;
-                }
-                SpawnZombieOutsideOfCamera(zombiePrefab);
-                zombiesAlive++;
-                zombieSpawnCount--;
-                yield return new WaitForSeconds(Random.Range(0.3f, 1.5f));
             }
 
             while (zombiesAlive < 0)
