@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/CityTown/CityTown.unity
+- path: Assets/Scenes/Cementery/Cementery.unity
   isLoaded: 1
   isActive: 1
